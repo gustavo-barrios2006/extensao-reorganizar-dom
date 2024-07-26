@@ -36,6 +36,10 @@ else
     intervaloOriginal.deleteContents();
     filhos.reverse().forEach(elemento=>{
         intervaloOriginal.insertNode(elemento);
+        if(elemento.childNodes.length>0)
+        {
+            varreEReposiciona(elemento as HTMLElement);
+        }
     })
 }
 function getNodeBoundingRect(node:Node):DOMRect
