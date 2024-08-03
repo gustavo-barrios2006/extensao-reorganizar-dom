@@ -36,7 +36,7 @@ else
     intervaloOriginal.deleteContents();
     filhos.reverse().forEach(elemento=>{
         intervaloOriginal.insertNode(elemento);
-        if(elemento.childNodes.length>0)
+        if(elemento.childNodes.length >0)
         {
             varreEReposiciona(elemento as HTMLElement);
         }
@@ -56,5 +56,22 @@ function getNodeBoundingRect(node:Node):DOMRect
         return range.getBoundingClientRect();
     }
 }
-const corpo:HTMLElement=document.body;
-varreEReposiciona(corpo);
+const observer=new MutationObserver((mutacoes:MutationRecord[], observer:MutationObserver)=>{
+    mutacoes.forEach(mutacao=>{
+        if(mutacao.type=="childList")
+        {
+            varreEReposiciona(mutacao.target as HTMLElement);
+            Array.from(mutacao.addedNodes).concat(Array.from(mutacao.removedNodes)).forEach(element=>{
+                let coordenadas:DOMRect=(element as HTMLElement).getBoundingClientRect();
+                let coordenadasPai:DOMRect=element.parentElement.getBoundingClientRect();
+            if(coordenadasPai.top>coordenadas.top||coordenadasPai.left>coordenadas.left)
+            {
+                varreEReposiciona(document.body);
+            }
+});
+        }
+    });
+});
+observer.observe(document.body, {childList:true, subtree:true});
+var corpoAntes:HTMLElement=document.body;
+varreEReposiciona(corpoAntes);
