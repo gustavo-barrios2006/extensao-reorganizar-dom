@@ -73,5 +73,7 @@ const observer=new MutationObserver((mutacoes:MutationRecord[], observer:Mutatio
     });
 });
 observer.observe(document.body, {childList:true, subtree:true});
-var corpoAntes:HTMLElement=document.body;
-varreEReposiciona(corpoAntes);
+var resizeObserver=new ResizeObserver(entries=>{
+    varreEReposiciona(document.body);
+});
+varreEReposiciona(document.body);
