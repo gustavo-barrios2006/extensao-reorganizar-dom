@@ -1,0 +1,2 @@
+index.ts(41,27): error TS2713: Cannot access 'HTMLElement.childElementCount' because 'HTMLElement' is a type, but not a namespace. Did you mean to retrieve the type of the property 'childElementCount' in 'HTMLElement' with 'HTMLElement["childElementCount"]'?
+index.ts(43,35): error TS2552: Cannot find name 'elemento'. Did you mean 'element'?

@@ -1,7 +1,7 @@
 function varreEReposiciona(elementoPai:HTMLElement)
 {
     const filhos:Node[]=Array.from(elementoPai.childNodes as NodeListOf<Node>);
-    const intervaloOriginal:Range=document.createRange();
+     const intervaloOriginal:Range=document.createRange();
     intervaloOriginal.setStartBefore(filhos[0]);
     intervaloOriginal.setEndAfter(filhos[filhos.length-1]);
     filhos.sort((a, b)=>{
@@ -34,13 +34,16 @@ else
 }
     });
     intervaloOriginal.deleteContents();
-    filhos.reverse().forEach(elemento=>{
-        intervaloOriginal.insertNode(elemento);
-        if(elemento.childNodes.length >0)
+    filhos.reverse().forEach(element=>{
+        intervaloOriginal.insertNode(element);
+        if(element instanceof HTMLElement)
         {
-            varreEReposiciona(elemento as HTMLElement);
+            if((element as HTMLElement).childElementCount>0)
+            {
+                varreEReposiciona(element as HTMLElement);
+            }
         }
-    })
+    });
 }
 function getNodeBoundingRect(node:Node):DOMRect
 {
@@ -76,4 +79,28 @@ observer.observe(document.body, {childList:true, subtree:true});
 var resizeObserver=new ResizeObserver(entries=>{
     varreEReposiciona(document.body);
 });
+observaElementosComResizeObserver(document.body);
+function observaElementosComResizeObserver(elementoPai:HTMLElement)
+{
+    if(elementoPai.childElementCount>1)
+    {
+        Array.from(elementoPai.children).forEach(element => {
+            resizeObserver.observe(element, {box: "border-box"});
+            if(element.childElementCount>1)
+            {
+                observaElementosComResizeObserver(element as HTMLElement);
+            }
+            else
+            if(element.childElementCount)
+            {
+                resizeObserver.observe(element.children[0]);
+            }
+        });
+    }
+    else
+    if(elementoPai.childElementCount==1)
+    {
+        resizeObserver.observe(elementoPai.children[0]);
+    }
+}
 varreEReposiciona(document.body);
