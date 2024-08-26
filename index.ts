@@ -64,7 +64,8 @@ const observer=new MutationObserver((mutacoes:MutationRecord[], observer:Mutatio
         if(mutacao.type=="childList")
         {
             varreEReposiciona(mutacao.target as HTMLElement);
-            Array.from(mutacao.addedNodes).concat(Array.from(mutacao.removedNodes)).forEach(element=>{
+            Array.from(mutacao.addedNodes).forEach(element=>{
+                resizeObserver.observe(element as Element);
                 let coordenadas:DOMRect=(element as HTMLElement).getBoundingClientRect();
                 let coordenadasPai:DOMRect=element.parentElement.getBoundingClientRect();
             if(coordenadasPai.top>coordenadas.top||coordenadasPai.left>coordenadas.left)
@@ -72,8 +73,11 @@ const observer=new MutationObserver((mutacoes:MutationRecord[], observer:Mutatio
                 varreEReposiciona(document.body);
             }
 });
-        }
-    });
+Array.from(mutacao.removedNodes).forEach(element=>{
+    resizeObserver.unobserve(element as Element);
+});
+}
+});
 });
 observer.observe(document.body, {childList:true, subtree:true});
 var resizeObserver=new ResizeObserver(entries=>{
