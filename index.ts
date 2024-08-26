@@ -91,7 +91,7 @@ function observaElementosComResizeObserver(elementoPai:HTMLElement)
                 observaElementosComResizeObserver(element as HTMLElement);
             }
             else
-            if(element.childElementCount)
+            if(element.childElementCount==1)
             {
                 resizeObserver.observe(element.children[0]);
             }
