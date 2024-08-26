@@ -54,7 +54,7 @@ function getNodeBoundingRect(node:Node):DOMRect
     else
     if(node instanceof Text)
     {
-        const range=document.createRange();
+        const range:Range=document.createRange();
         range.selectNodeContents(node);
         return range.getBoundingClientRect();
     }
