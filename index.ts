@@ -1,4 +1,4 @@
-let mapaElementos = new WeakMap();
+import {debounce} from 'underscore';
 function varreEReposiciona(elementoPai: HTMLElement, eCarregamento:boolean=false) {
     const filhos: Node[] = Array.from(elementoPai.childNodes as NodeListOf<Node>);
     const intervaloOriginal: Range = document.createRange();
@@ -31,19 +31,15 @@ function varreEReposiciona(elementoPai: HTMLElement, eCarregamento:boolean=false
         var posicaoElemento:DOMRect = mapaElementos.get(elementoPai).getBoundingClientRect();
         if(posicaoElemento)
         {
-        }
         if (typeof posicaoElemento !== 'undefined') {
             var posicaoAtualElemento:DOMRect = elementoPai.getBoundingClientRect();
         }
     }
+}
     if (typeof posicaoElemento !== 'undefined' && (posicaoElemento.left !== posicaoAtualElemento.left||posicaoElemento.top!==posicaoAtualElemento.top||eCarregamento))
     {
         mapaElementos.set(elementoPai, elementoPai.cloneNode(false));
-        if (typeof posicaoElemento !== 'undefined' && (posicaoElemento.left !== posicaoAtualElemento.left||posicaoElemento.top!==posicaoAtualElemento.top||eCarregamento))
-        {
         intervaloOriginal.deleteContents();
-    }
-}
     filhos.reverse().forEach(element => {
             intervaloOriginal.insertNode(element);
         if (element instanceof HTMLElement) {
@@ -52,6 +48,7 @@ function varreEReposiciona(elementoPai: HTMLElement, eCarregamento:boolean=false
             }
         }
     });
+}
 }
 function getNodeBoundingRect(node: Node): DOMRect {
     if (node instanceof HTMLElement) {
@@ -109,4 +106,6 @@ function observaElementosComResizeObserver(elementoPai: HTMLElement) {
         resizeObserver.observe(elementoPai, { box: "border-box" });
     }
 }
-varreEReposiciona(document.body, true);
+let mapaElementos=new WeakMap();
+window.addEventListener("resize", (event:UIEvent)=>{debounce(function(){varreEReposiciona(document.body)}, 300, true)}); 
+varreEReposiciona(document.body);
