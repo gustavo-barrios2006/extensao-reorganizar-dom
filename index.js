@@ -1,7 +1,7 @@
 import { debounce } from 'underscore';
-function varreEReposiciona(elementoPai: HTMLElement, eCarregamento: boolean = false) {
-    const filhos: Node[] = Array.from(elementoPai.childNodes as NodeListOf<Node>);
-    const intervaloOriginal: Range = document.createRange();
+function varreEReposiciona(elementoPai, eCarregamento = false) {
+    const filhos = Array.from(elementoPai.childNodes);
+    const intervaloOriginal = document.createRange();
     intervaloOriginal.setStartBefore(elementoPai);
     intervaloOriginal.setEndAfter(elementoPai);
     filhos.sort((a, b) => {
@@ -13,25 +13,23 @@ function varreEReposiciona(elementoPai: HTMLElement, eCarregamento: boolean = fa
         if (rectA.top < rectB.top) {
             return -1;
         }
-        else
-            if (rectA.top > rectB.top) {
+        else if (rectA.top > rectB.top) {
+            return 1;
+        }
+        else {
+            if (rectA.left < rectB.left) {
+                return -1;
+            }
+            else if (rectA.left > rectB.left) {
                 return 1;
             }
             else {
-                if (rectA.left < rectB.left) {
-                    return -1;
-                }
-                else
-                    if (rectA.left > rectB.left) {
-                        return 1;
-                    }
-                    else {
-                        return 0;
-                    }
+                return 0;
             }
+        }
     });
-    let posicaoElemento: DOMRect = mapaElementos.get(elementoPai).getBoundingClientRect();
-    let posicaoAtualElemento: DOMRect | undefined;
+    let posicaoElemento = mapaElementos.get(elementoPai).getBoundingClientRect();
+    let posicaoAtualElemento;
     if (elementoPai instanceof HTMLElement) {
         if (posicaoElemento) {
             posicaoAtualElemento = elementoPai.getBoundingClientRect();
@@ -43,41 +41,40 @@ function varreEReposiciona(elementoPai: HTMLElement, eCarregamento: boolean = fa
         filhos.reverse().forEach(element => {
             intervaloOriginal.insertNode(element);
             if (element instanceof HTMLElement) {
-                if ((element as HTMLElement).childElementCount > 0) {
-                    varreEReposiciona(element as HTMLElement, eCarregamento);
+                if (element.childElementCount > 0) {
+                    varreEReposiciona(element, eCarregamento);
                 }
             }
         });
     }
 }
-function getNodeBoundingRect(node: Node): DOMRect | undefined {
+function getNodeBoundingRect(node) {
     if (node instanceof HTMLElement) {
         return node.getBoundingClientRect();
     }
-    else
-        if (node instanceof Text) {
-            const range: Range = document.createRange();
-            range.selectNodeContents(node);
-            return range.getBoundingClientRect();
-        }
+    else if (node instanceof Text) {
+        const range = document.createRange();
+        range.selectNodeContents(node);
+        return range.getBoundingClientRect();
+    }
 }
-const observer = new MutationObserver((mutacoes: MutationRecord[], observer: MutationObserver) => {
+const observer = new MutationObserver((mutacoes, observer) => {
     mutacoes.forEach(mutacao => {
-        if (mutacao.type == "childList" && !mapaElementos.has(mutacao.target as HTMLElement)) {
-            varreEReposiciona(mutacao.target as HTMLElement);
+        if (mutacao.type == "childList" && !mapaElementos.has(mutacao.target)) {
+            varreEReposiciona(mutacao.target);
             Array.from(mutacao.addedNodes).forEach(element => {
                 if (element instanceof HTMLElement) {
-                    resizeObserver.observe(element as HTMLElement);
-                    let coordenadas: DOMRect = (element as HTMLElement).getBoundingClientRect();
-                    let coordenadasPai: DOMRect = (element.parentElement as HTMLElement).getBoundingClientRect();
-                    if (coordenadasPai.top > coordenadas.top || coordenadasPai.left > coordenadas.left && !mapaElementos.has(element as HTMLElement)) {
+                    resizeObserver.observe(element);
+                    let coordenadas = element.getBoundingClientRect();
+                    let coordenadasPai = element.parentElement.getBoundingClientRect();
+                    if (coordenadasPai.top > coordenadas.top || coordenadasPai.left > coordenadas.left && !mapaElementos.has(element)) {
                         varreEReposiciona(document.body);
                     }
                 }
             });
             Array.from(mutacao.removedNodes).forEach(element => {
-                resizeObserver.unobserve(element as HTMLElement);
-                if (mapaElementos.has(element as HTMLElement)) {
+                resizeObserver.unobserve(element);
+                if (mapaElementos.has(element)) {
                     //mapaElementos.delete(element as HTMLElement);
                 }
             });
@@ -89,12 +86,12 @@ var resizeObserver = new ResizeObserver(entries => {
     varreEReposiciona(document.body);
 });
 observaElementosComResizeObserver(document.body);
-function observaElementosComResizeObserver(elementoPai: HTMLElement) {
+function observaElementosComResizeObserver(elementoPai) {
     mapaElementos.set(elementoPai, elementoPai.cloneNode(false));
     if ((elementoPai.childElementCount > 1) || (elementoPai.childElementCount == 1 && elementoPai.children[0] instanceof HTMLElement)) {
         Array.from(elementoPai.children).forEach(element => {
             if (element.childElementCount >= 1) {
-                observaElementosComResizeObserver(element as HTMLElement);
+                observaElementosComResizeObserver(element);
             }
             else {
                 resizeObserver.observe(element, { box: "border-box" });
@@ -107,5 +104,5 @@ function observaElementosComResizeObserver(elementoPai: HTMLElement) {
     }
 }
 let mapaElementos = new WeakMap();
-window.addEventListener("resize", (event: UIEvent) => { debounce(function () { varreEReposiciona(document.body) }, 300, true) });
+window.addEventListener("resize", (event) => { debounce(function () { varreEReposiciona(document.body); }, 300, true); });
 varreEReposiciona(document.body);
