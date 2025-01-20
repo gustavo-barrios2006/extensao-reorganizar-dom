@@ -37,8 +37,18 @@ function varreEReposiciona(elementoPai: HTMLElement, eCarregamento: boolean = fa
             posicaoAtualElemento = elementoPai.getBoundingClientRect();
         }
     }
-    if (posicaoAtualElemento && (posicaoElemento.left !== posicaoAtualElemento.left || posicaoElemento.top !== posicaoAtualElemento.top || eCarregamento)) {
+    if (posicaoAtualElemento && (posicaoElemento.left !== posicaoAtualElemento.left || posicaoElemento.top !== posicaoAtualElemento.top || eCarregamento))
+    {
         mapaElementos.set(elementoPai, elementoPai.cloneNode(false));
+        if(elementoPai.shadowRoot!=null)
+        {
+            const elementoClonado = mapaElementos.get(elementoPai);
+            const shadowRootOriginal = elementoPai.shadowRoot;
+        const shadowRootClonado = elementoClonado.attachShadow({mode: shadowRootOriginal.mode, delegatesFocus: shadowRootOriginal.delegatesFocus, serializable: shadowRootOriginal.serializable, clonable: shadowRootOriginal.clonable, slotAssignment: shadowRootOriginal.slotAssignment});
+            shadowRootClonado.innerHTML=shadowRootOriginal.innerHTML;
+            shadowRootClonado.adoptedStyleSheets = shadowRootOriginal.adoptedStyleSheets;
+            varreEReposiciona(new DOMParser().parseFromString(elementoPai.shadowRoot.innerHTML, "text/html").body);
+        }
         intervaloOriginal.deleteContents();
         filhos.reverse().forEach(element => {
             intervaloOriginal.insertNode(element);
