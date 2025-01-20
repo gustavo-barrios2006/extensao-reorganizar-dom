@@ -43,7 +43,7 @@ function varreEReposiciona(elementoPai: HTMLElement, eCarregamento: boolean = fa
         filhos.reverse().forEach(element => {
             intervaloOriginal.insertNode(element);
             if (element instanceof HTMLElement) {
-                if ((element as HTMLElement).childElementCount > 0 && !((element as HTMLElement).getAttribute("slot")) {
+                if ((element as HTMLElement).childElementCount > 0 && !((element as HTMLElement).getAttribute("slot"))) {
                     varreEReposiciona(element as HTMLElement, eCarregamento);
                 }
             }
