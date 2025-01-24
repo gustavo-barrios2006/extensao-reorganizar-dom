@@ -6,5 +6,9 @@
   },
   "dependencies": {
     "@types/underscore": "^1.11.15",
-  }
+  },
+"scripts": {
+  "build": "webpack --mode production",
+  "watch": "webpack --watch"
+}
 }
