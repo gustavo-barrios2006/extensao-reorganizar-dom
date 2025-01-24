@@ -2,12 +2,12 @@
   "devDependencies": {
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
-    "typescript": "^5.5.3",
+    "typescript": "^5.7.3",
     "webpack": "^5.97.1",
     "webpack-cli": "^6.0.1"
   },
   "dependencies": {
-    "@types/underscore": "^1.11.15",
+    "@types/underscore": "^1.13.0",
     "underscore": "^1.13.7"
   },
   "scripts": {
