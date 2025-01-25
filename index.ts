@@ -1,5 +1,5 @@
 import { debounce } from 'underscore';
-function varreEReposiciona(elementoPai: HTMLElement, eCarregamento: boolean = false) {
+function varreEReposiciona(elementoPai: HTMLElement|ShadowRoot, eCarregamento: boolean = false, eShadowRoot: boolean = false) {
     const filhos: Node[] = Array.from(elementoPai.childNodes as NodeListOf<Node>);
     const intervaloOriginal: Range = document.createRange();
     intervaloOriginal.setStartBefore(elementoPai);
@@ -40,21 +40,17 @@ function varreEReposiciona(elementoPai: HTMLElement, eCarregamento: boolean = fa
     if (posicaoAtualElemento && (posicaoElemento.left !== posicaoAtualElemento.left || posicaoElemento.top !== posicaoAtualElemento.top || eCarregamento))
     {
         mapaElementos.set(elementoPai, elementoPai.cloneNode(false));
-        if(elementoPai.shadowRoot!=null)
+        if(elementoPai instanceof HTMLElement && elementoPai.shadowRoot!=null)
         {
-            const elementoClonado = mapaElementos.get(elementoPai);
-            const shadowRootOriginal = elementoPai.shadowRoot;
-        const shadowRootClonado = elementoClonado.attachShadow({mode: shadowRootOriginal.mode, delegatesFocus: shadowRootOriginal.delegatesFocus, serializable: shadowRootOriginal.serializable, clonable: shadowRootOriginal.clonable, slotAssignment: shadowRootOriginal.slotAssignment});
-            shadowRootClonado.innerHTML=shadowRootOriginal.innerHTML;
-            shadowRootClonado.adoptedStyleSheets = shadowRootOriginal.adoptedStyleSheets;
-            varreEReposiciona(new DOMParser().parseFromString(elementoPai.shadowRoot.innerHTML, "text/html").body);
+            clonaShadowRoot(elementoPai);
+            varreEReposiciona(elementoPai.shadowRoot, eShadowRoot=true);
         }
         intervaloOriginal.deleteContents();
         filhos.reverse().forEach(element => {
             intervaloOriginal.insertNode(element);
             if (element instanceof HTMLElement) {
                 if ((element as HTMLElement).childElementCount > 0 && !((element as HTMLElement).getAttribute("slot"))) {
-                    varreEReposiciona(element as HTMLElement, eCarregamento);
+                    varreEReposiciona(element as HTMLElement, eCarregamento, eShadowRoot);
                 }
             }
         });
