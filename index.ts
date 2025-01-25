@@ -116,6 +116,45 @@ function observaElementosComResizeObserver(elementoPai: HTMLElement) {
         resizeObserver.observe(elementoPai, { box: "border-box" });
     }
 }
+function observaElementosDoShadowDOMComMutationObserver(elementoPai: HTMLElement)
+{
+    if(elementoPai==document.body && elementoPai.shadowRoot)
+    {
+        observer.observe(elementoPai.shadowRoot);
+    }
+    if ((elementoPai.childElementCount > 1) || (elementoPai.childElementCount == 1 && elementoPai.children[0] instanceof HTMLElement))
+    {
+        Array.from(elementoPai.children).forEach(element =>
+            {
+            if (element instanceof HTMLElement && element.shadowRoot)
+            {
+                observer.observe(element.shadowRoot, { childList: true, subtree: true });
+                clonaShadowRoot(element);
+            }
+            if (element instanceof HTMLElement && ((element.childElementCount > 1) || (element.childElementCount == 1 && element.children[0] instanceof HTMLElement)))
+            {
+                observaElementosDoShadowDOMComMutationObserver(element as HTMLElement);
+            }
+        });
+    }
+    else
+    if(elementoPai.shadowRoot&&elementoPai!=document.body)
+    {
+        observer.observe(elementoPai.shadowRoot, { childList: true, subtree: true });
+        clonaShadowRoot(elementoPai);
+    }
+}
 let mapaElementos = new WeakMap();
 window.addEventListener("resize", (event: UIEvent) => { debounce(function () { varreEReposiciona(document.body) }, 300, true) });
 varreEReposiciona(document.body);
+function clonaShadowRoot(element: HTMLElement)
+{
+    if(element.shadowRoot)
+    {
+    const elementoClonado = mapaElementos.get(element);
+    const shadowRootOriginal = element.shadowRoot;
+const shadowRootClonado = elementoClonado.attachShadow({mode: shadowRootOriginal.mode, delegatesFocus: shadowRootOriginal.delegatesFocus, serializable: shadowRootOriginal.serializable, clonable: shadowRootOriginal.clonable, slotAssignment: shadowRootOriginal.slotAssignment});
+    shadowRootClonado.innerHTML=shadowRootOriginal.innerHTML;
+    shadowRootClonado.adoptedStyleSheets = shadowRootOriginal.adoptedStyleSheets;
+    }
+}
